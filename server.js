@@ -9,7 +9,10 @@ const bot = new TelegramBot(botToken, {polling: true});
 
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
-    let m=/((https?|ftp):\/\/[^\s/$.?#].[^\s]*)/.exec(msg.text);
+    
+	//regex match to find share URL
+	let m=/((https?|ftp):\/\/[^\s/$.?#].[^\s]*)/.exec(msg.text);
+	
     if(!m){
         bot.sendMessage(chatId, 'I can not find the url in your message.',{reply_to_message_id:msg.message_id});
     }else{
@@ -18,15 +21,24 @@ bot.on('message', async (msg) => {
         let shortUrl=m[1];
         const url = await tall(shortUrl);
         try {
-            const post = await TikTokScraper.getVideoMeta(url, {});
-            console.log(post);
+            const post = (await TikTokScraper.getVideoMeta(url, {})).collector.pop();
+			
+			console.log('POST:',post);
+			
+		
+			
+            
 
             let msg_data={};
             let post_record=await BroadcastLog.findOne({where: {id: post.id}});
+			
+			//if url foung in database try to forward it
             if(post_record){
                 console.log(`Already exists: ${post.id}`);
                 msg_data={message_id:post_record.message_id,chat:{id:post_record.chat_id}};
-            }else{
+				
+            }else{//if is new send to cache channel and then forward it
+				
                 console.log(`Sending: ${post.id}`);
                 msg_data=await sendToChannel(post,BroadcastLog);
             }

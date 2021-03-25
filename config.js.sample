@@ -1,4 +1,4 @@
 module.exports={
 botToken :'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx',
-channel:'@my_channel'
+cacheChannel:'@my_cache_channel'
 }

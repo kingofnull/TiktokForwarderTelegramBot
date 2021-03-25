@@ -1,7 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 
 
-const {botToken,channel} = require('./config');;
+const {botToken,cacheChannel} = require('./config');;
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(botToken, {polling: false});
 
@@ -25,7 +25,12 @@ module.exports.sendToChannel = async (tiktokPost, BroadcastLog) => {
    })*/
     //END REGION
 
-    let r = await bot.sendMessage(channel,
+	if(!cacheChannel){
+		console.error("cache cacheChannel is not filled in config.");
+		return;
+	}
+	
+    let r = await bot.sendMessage(cacheChannel,
         `${tiktokPost.text}\n\n` +
         `<code>User: ${tiktokPost.authorMeta.name}</code>\n` +
         (tiktokPost.musicMeta.musicAuthor !== tiktokPost.authorMeta.name ? `<code>Music: ${tiktokPost.musicMeta.musicAuthor} - ${tiktokPost.musicMeta.musicName}</code>` : '') +
